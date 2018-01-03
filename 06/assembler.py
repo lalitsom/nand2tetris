@@ -36,18 +36,10 @@ def convert(_ins):
             dest = _ins[0:_ins.index('=')]
             comp_start = _ins.index('=') + 1
         if ';' in _ins:
-            jmp = _ins[_ins.index(';')+1, len(_ins)]
+            jmp = _ins[_ins.index(';')+1: len(_ins)]
             comp_end = _ins.index(';')
 
         comp = _ins[comp_start: comp_end]
-
-        print("////////////////////")
-        print(_ins)
-        print('dest ',dest)
-        print('comp ',comp)
-        print('jmp ',jmp)
-        print("////////////////////")
-
 
         # find dest instruction
         if 'A' in dest:
@@ -61,7 +53,7 @@ def convert(_ins):
 
         if 'L' in jmp or 'NE' in jmp:        # less than or not equal to
             c_inst[13] = '1'
-        if 'E' in jmp:
+        if 'E' in jmp and 'NE' not in jmp:
             c_inst[14] = '1'
         if 'GT' in jmp or 'GE' in jmp or 'NE' in jmp:
             c_inst[15] = '1'
@@ -84,18 +76,19 @@ def convert(_ins):
         if match1(exp,comp):
             c_inst[5] = '1'
 
-        if 'A' not in comp:
+        exp = ['A']
+        if not match1(exp,comp):
             c_inst[6] = '1'
 
         exp = ['x1', 'xD', 'x!D', 'x-D', 'xD+1', 'xA+1', 'xD-1', 'xA-D', 'xD|A' ]
         if match1(exp,comp):
             c_inst[7] = '1'
 
-        exp = ['x0', 'x1', '-1', '+']
+        exp = ['x0', 'x1', '-', '+']
         if match1(exp,comp):
             c_inst[8] = '1'
 
-        exp = ['x1', '-D', '-A', '+1', '!', '!A']
+        exp = ['x1', '-D', '-A', '+1', '!', '!A', '|']
         if match1(exp,comp):
             c_inst[9] = '1'
 
